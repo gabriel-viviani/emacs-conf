@@ -108,3 +108,43 @@
 (map! :leader :desc "Yank file path rel to project"
       "y y" #'+default/yank-buffer-path-relative-to-project
       )
+
+
+;; GOLANG:
+(add-hook 'go-mode-hook #'lsp-deferred)
+;; Make sure you don't have other goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+(after! lsp-mode
+  (setq  lsp-go-analyses '((fieldalignment . t)
+                           (nilness . t)
+                           (shadow . t)
+                           (unusedparams . t)
+                           (unusedwrite . t)
+                           (useany . t)
+                           (unusedvariable . t)))
+  )
+
+
+(add-to-list 'exec-path "/home/vivi/.nvm/versions/node/v22.2.0/lib/node_modules/.bin")
+
+(add-hook 'vue-mode-hook #'lsp!)
+
+;; Python config:
+(after! lsp-mode
+  (setq lsp-auto-guess-root nil))
+(after! projectile
+  (setq projectile-project-root-files '("Dockerfile" "requirements.txt")))
+(set-popup-rule! "^\\*lsp-help" :side 'right :size .50 :select t :vslot 1)
+(after! lsp-mode
+  (setq lsp-diagnostic-provider :none))
+(after! flycheck
+  (add-hook 'pyhon-mode-local-vars-hook
+            (lambda ()
+              (when (flycheck-may-enable-checker 'python-flake8)
+                (flycheck-select-checker 'python-flake8)))))
+(after! lsp-mode
+  (setq lsp-restart 'ignore))
+
